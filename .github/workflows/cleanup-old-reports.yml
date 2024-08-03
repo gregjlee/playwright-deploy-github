@@ -1,0 +1,36 @@
+# Reference: https://blog.martioli.com/publish-your-playwright-reports-to-github-pages/
+name: Delete old test reports from Github Pages
+on:
+  workflow_dispatch:
+    inputs:
+      n_days:
+        description: 'Number of days to determine which reports to delete. Example: 14 will delete all reports older than 14 days'
+        required: true
+        default: 14
+jobs:
+  delete_old_folders:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with: 
+          ref: gh-pages
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.9
+
+      - name: Run script to remove old report folders
+        run: python rm_old_folders.py --n-days ${{ github.event.inputs.n_days }}
+
+      - name: Commit all changed files back to the repository
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          branch: gh-pages
+          commit_message: Delete report folders older than ${{ github.event.inputs.n_days }} days
+
+
