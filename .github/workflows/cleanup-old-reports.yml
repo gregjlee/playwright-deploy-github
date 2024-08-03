@@ -7,6 +7,9 @@ on:
         description: 'Number of days to determine which reports to delete. Example: 14 will delete all reports older than 14 days'
         required: true
         default: 14
+  schedule:
+    - cron: '*/5 * * * *'  # Runs every 5 minutes
+
 jobs:
   delete_old_folders:
     runs-on: ubuntu-latest
@@ -24,13 +27,17 @@ jobs:
         with:
           python-version: 3.9
 
+      - name: Set n_days value
+        id: set-n-days
+        run: echo "n_days=$([[ '${{ github.event.inputs.n_days }}' != '' ]] && echo '${{ github.event.inputs.n_days }}' || echo '14')" >> $GITHUB_ENV
+
       - name: Run script to remove old report folders
-        run: python rm_old_folders.py --n-days ${{ github.event.inputs.n_days }}
+        run: python rm_old_folders.py --n-days ${{ env.n_days }}
 
       - name: Commit all changed files back to the repository
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           branch: gh-pages
-          commit_message: Delete report folders older than ${{ github.event.inputs.n_days }} days
+          commit_message: Delete report folders older than ${{ env.n_days }} days
 
 
