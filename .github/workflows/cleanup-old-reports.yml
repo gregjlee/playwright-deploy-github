@@ -7,9 +7,8 @@ on:
         description: 'Number of days to determine which reports to delete. Example: 14 will delete all reports older than 14 days'
         required: true
         default: 14
-  schedule:
-    - cron: '*/5 * * * *'  # Runs every 5 minutes
-
+  # schedule:
+  #   - cron: '*/5 * * * *'  # Runs every 5 minutes
 jobs:
   delete_old_folders:
     runs-on: ubuntu-latest
